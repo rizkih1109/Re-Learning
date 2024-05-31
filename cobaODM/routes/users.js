@@ -4,10 +4,12 @@ const User = require('../models/User')
 
 router.get('/', async (req, res, next) => {
   try {
-    const { name, phone, page = 1 } = req.query
+    const { name, phone, page = 1, sortBy = '_id', sortMode = 'asc' } = req.query
     const params = {}
     const limit = 3
     const offsite = (page -1) * limit
+    const sort = {}
+    sort[sortBy] = sortMode
 
     if(name) {
       params['name'] = new RegExp(name, 'i')
@@ -20,9 +22,9 @@ router.get('/', async (req, res, next) => {
     const total = await User.countDocuments(params)
     const pages = Math.ceil(total/limit)
 
-    const users = await User.find(params).limit(limit).skip(offsite)
+    const users = await User.find(params).populate('todos').sort(sort).limit(limit).skip(offsite)
     res.json({
-      data:users, page: Number(page), pages, total
+      data:users, page: Number(page), pages
     })
   } catch (err) {
     res.status(500).json({ err })
