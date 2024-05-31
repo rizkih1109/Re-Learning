@@ -16,10 +16,25 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     name: DataTypes.STRING
   }, {
-    sequelize,
-    modelName: 'User',
+    hooks: {
+      beforeCreate: (record, options) => {
+        record.dataValues.createdAt = new Date().toISOString().replace(/T/, ' ').replace(/\..+/g, '');
+        record.dataValues.updatedAt = new Date().toISOString().replace(/T/, ' ').replace(/\..+/g, '');
+      },
+      sequelize,
+      modelName: 'User',
+    }
   });
   return User;
 };
