@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 const models = require('../models');
 const { where } = require('sequelize');
+const { tokenValid } = require('../helpers/util');
 
-router.get('/', async (req, res, next) => {
+router.get('/', tokenValid, async (req, res, next) => {
   try {
     const users = await models.User.findAll({ include: models.Todo })
     res.json(users)
@@ -15,8 +16,8 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const { name } = req.body
-    const user = await models.User.create({ name })
+    const { email, password, name } = req.body
+    const user = await models.User.create({ email, password, name })
     res.json(user)
   } catch (err) {
     console.log(err)

@@ -1,4 +1,7 @@
 'use strict';
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 const {
   Model
 } = require('sequelize');
@@ -13,6 +16,14 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Todo, {
         foreignKey: 'executor'
       })
+    }
+
+    static hashPassword(password) {
+      return bcrypt.hashSync(password, saltRounds)
+    }
+
+    checkPassword(password) {
+      return bcrypt.compareSync(password, this.dataValues.password)
     }
   }
   User.init({
@@ -29,12 +40,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     hooks: {
       beforeCreate: (record, options) => {
-        record.dataValues.createdAt = new Date().toISOString().replace(/T/, ' ').replace(/\..+/g, '');
-        record.dataValues.updatedAt = new Date().toISOString().replace(/T/, ' ').replace(/\..+/g, '');
-      },
-      sequelize,
-      modelName: 'User',
-    }
+        record.dataValues.password = User.hashPassword(record.dataValues.password, saltRounds)
+      }
+    },
+    sequelize,
+    modelName: 'User',
   });
   return User;
 };
