@@ -2,34 +2,36 @@ var express = require('express');
 var router = express.Router();
 const Todo = require('../models/Todo')
 const User = require('../models/User');
-const { tokenValid } = require('../helpers/util');
+const { tokenValid, Response } = require('../helpers/util');
 
 router.get('/', tokenValid, async (req, res, next) => {
   try {
     const { title, complete, page = 1, sortBy = '_id', sortMode = 'asc' } = req.query
-    const params = {executor: req.user.userid}
+    const params = { executor: req.user.userid }
     const limit = 3
-    const offsite = (page -1) * limit
+    const offsite = (page - 1) * limit
     const sort = {}
     sort[sortBy] = sortMode
 
-    if(title) {
+    if (title) {
       params['title'] = new RegExp(title, 'i')
     }
 
-    if(complete) {
+    if (complete) {
       params['phone'] = JSON.parse(complete)
     }
 
     const total = await Todo.countDocuments(params)
-    const pages = Math.ceil(total/limit)
+    const pages = Math.ceil(total / limit)
 
     const todos = await Todo.find(params).populate('executor').sort(sort).limit(limit).skip(offsite)
-    res.json({
-      data:todos, page: Number(page), pages
-    })
+    res.json(new Response({
+      todos, 
+      page: Number(page), 
+      pages
+    }))
   } catch (err) {
-    res.status(500).json({ err })
+    res.status(500).json(new Response(err.message, false))
   }
 });
 
