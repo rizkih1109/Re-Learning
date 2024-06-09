@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const models = require('../models');
-const { generateToken } = require('../helpers/util')
+const { generateToken } = require('../helpers/util');
 
 router.post('/login', async (req, res, next) => {
   try {

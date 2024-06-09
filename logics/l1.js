@@ -1,4 +1,7 @@
-const kata = 'NEGIE1'
+const txt = 'NEGIE1'
 
-const coba = kata.slice(0,-1).split('').reverse().join('').concat(kata.slice(-1))
-console.log(coba)
+function reverse(txt) {
+    return txt.replace(/[A-Za-z]+/g, x => Array.from(x).reverse().join(''))
+}
+
+console.log(reverse(txt))

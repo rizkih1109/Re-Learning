@@ -6,7 +6,7 @@ const { tokenValid } = require('../helpers/util');
 
 router.get('/', tokenValid, async (req, res, next) => {
   try {
-    const todos = await models.Todo.findAll({include: models.User})
+    const todos = await models.Todo.findAll({where: {executor: req.user.userid} , include: models.User})
     res.json(todos)
   } catch (err) {
     console.log(err)
